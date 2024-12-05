@@ -2,4 +2,4 @@
 A small demonstration of Unity knowledge!
 
 ## How to test
-Load Assets/MainScene in the editor and press 'Play'.
+Load Assets/Scenes/MainScene in the editor and press 'Play'.
