@@ -24,7 +24,7 @@ public partial class @CameraControls: IInputActionCollection2, IDisposable
     ""name"": ""CameraControls"",
     ""maps"": [
         {
-            ""name"": ""Default"",
+            ""name"": ""RotateCamera"",
             ""id"": ""0f3f71df-3fed-4718-8e28-649bcf8618f3"",
             ""actions"": [
                 {
@@ -114,6 +114,34 @@ public partial class @CameraControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""MoveSelectable"",
+            ""id"": ""e88288f8-3dd7-4569-bb53-04f05813f5c7"",
+            ""actions"": [
+                {
+                    ""name"": ""HoldSelectable"",
+                    ""type"": ""Button"",
+                    ""id"": ""42b47e3f-c25e-46bd-a512-f0404c12ca8a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""57c51370-8a01-448e-bc41-bb65e75138ca"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HoldSelectable"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -135,10 +163,13 @@ public partial class @CameraControls: IInputActionCollection2, IDisposable
         }
     ]
 }");
-        // Default
-        m_Default = asset.FindActionMap("Default", throwIfNotFound: true);
-        m_Default_RotateCameraHorizontal = m_Default.FindAction("RotateCameraHorizontal", throwIfNotFound: true);
-        m_Default_RotateCameraVertical = m_Default.FindAction("RotateCameraVertical", throwIfNotFound: true);
+        // RotateCamera
+        m_RotateCamera = asset.FindActionMap("RotateCamera", throwIfNotFound: true);
+        m_RotateCamera_RotateCameraHorizontal = m_RotateCamera.FindAction("RotateCameraHorizontal", throwIfNotFound: true);
+        m_RotateCamera_RotateCameraVertical = m_RotateCamera.FindAction("RotateCameraVertical", throwIfNotFound: true);
+        // MoveSelectable
+        m_MoveSelectable = asset.FindActionMap("MoveSelectable", throwIfNotFound: true);
+        m_MoveSelectable_HoldSelectable = m_MoveSelectable.FindAction("HoldSelectable", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -197,26 +228,26 @@ public partial class @CameraControls: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // Default
-    private readonly InputActionMap m_Default;
-    private List<IDefaultActions> m_DefaultActionsCallbackInterfaces = new List<IDefaultActions>();
-    private readonly InputAction m_Default_RotateCameraHorizontal;
-    private readonly InputAction m_Default_RotateCameraVertical;
-    public struct DefaultActions
+    // RotateCamera
+    private readonly InputActionMap m_RotateCamera;
+    private List<IRotateCameraActions> m_RotateCameraActionsCallbackInterfaces = new List<IRotateCameraActions>();
+    private readonly InputAction m_RotateCamera_RotateCameraHorizontal;
+    private readonly InputAction m_RotateCamera_RotateCameraVertical;
+    public struct RotateCameraActions
     {
         private @CameraControls m_Wrapper;
-        public DefaultActions(@CameraControls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @RotateCameraHorizontal => m_Wrapper.m_Default_RotateCameraHorizontal;
-        public InputAction @RotateCameraVertical => m_Wrapper.m_Default_RotateCameraVertical;
-        public InputActionMap Get() { return m_Wrapper.m_Default; }
+        public RotateCameraActions(@CameraControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @RotateCameraHorizontal => m_Wrapper.m_RotateCamera_RotateCameraHorizontal;
+        public InputAction @RotateCameraVertical => m_Wrapper.m_RotateCamera_RotateCameraVertical;
+        public InputActionMap Get() { return m_Wrapper.m_RotateCamera; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(DefaultActions set) { return set.Get(); }
-        public void AddCallbacks(IDefaultActions instance)
+        public static implicit operator InputActionMap(RotateCameraActions set) { return set.Get(); }
+        public void AddCallbacks(IRotateCameraActions instance)
         {
-            if (instance == null || m_Wrapper.m_DefaultActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_DefaultActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_RotateCameraActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_RotateCameraActionsCallbackInterfaces.Add(instance);
             @RotateCameraHorizontal.started += instance.OnRotateCameraHorizontal;
             @RotateCameraHorizontal.performed += instance.OnRotateCameraHorizontal;
             @RotateCameraHorizontal.canceled += instance.OnRotateCameraHorizontal;
@@ -225,7 +256,7 @@ public partial class @CameraControls: IInputActionCollection2, IDisposable
             @RotateCameraVertical.canceled += instance.OnRotateCameraVertical;
         }
 
-        private void UnregisterCallbacks(IDefaultActions instance)
+        private void UnregisterCallbacks(IRotateCameraActions instance)
         {
             @RotateCameraHorizontal.started -= instance.OnRotateCameraHorizontal;
             @RotateCameraHorizontal.performed -= instance.OnRotateCameraHorizontal;
@@ -235,21 +266,67 @@ public partial class @CameraControls: IInputActionCollection2, IDisposable
             @RotateCameraVertical.canceled -= instance.OnRotateCameraVertical;
         }
 
-        public void RemoveCallbacks(IDefaultActions instance)
+        public void RemoveCallbacks(IRotateCameraActions instance)
         {
-            if (m_Wrapper.m_DefaultActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_RotateCameraActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IDefaultActions instance)
+        public void SetCallbacks(IRotateCameraActions instance)
         {
-            foreach (var item in m_Wrapper.m_DefaultActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_RotateCameraActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_DefaultActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_RotateCameraActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public DefaultActions @Default => new DefaultActions(this);
+    public RotateCameraActions @RotateCamera => new RotateCameraActions(this);
+
+    // MoveSelectable
+    private readonly InputActionMap m_MoveSelectable;
+    private List<IMoveSelectableActions> m_MoveSelectableActionsCallbackInterfaces = new List<IMoveSelectableActions>();
+    private readonly InputAction m_MoveSelectable_HoldSelectable;
+    public struct MoveSelectableActions
+    {
+        private @CameraControls m_Wrapper;
+        public MoveSelectableActions(@CameraControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @HoldSelectable => m_Wrapper.m_MoveSelectable_HoldSelectable;
+        public InputActionMap Get() { return m_Wrapper.m_MoveSelectable; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MoveSelectableActions set) { return set.Get(); }
+        public void AddCallbacks(IMoveSelectableActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MoveSelectableActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MoveSelectableActionsCallbackInterfaces.Add(instance);
+            @HoldSelectable.started += instance.OnHoldSelectable;
+            @HoldSelectable.performed += instance.OnHoldSelectable;
+            @HoldSelectable.canceled += instance.OnHoldSelectable;
+        }
+
+        private void UnregisterCallbacks(IMoveSelectableActions instance)
+        {
+            @HoldSelectable.started -= instance.OnHoldSelectable;
+            @HoldSelectable.performed -= instance.OnHoldSelectable;
+            @HoldSelectable.canceled -= instance.OnHoldSelectable;
+        }
+
+        public void RemoveCallbacks(IMoveSelectableActions instance)
+        {
+            if (m_Wrapper.m_MoveSelectableActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IMoveSelectableActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MoveSelectableActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MoveSelectableActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public MoveSelectableActions @MoveSelectable => new MoveSelectableActions(this);
     private int m_KeyboardAndMouseSchemeIndex = -1;
     public InputControlScheme KeyboardAndMouseScheme
     {
@@ -259,9 +336,13 @@ public partial class @CameraControls: IInputActionCollection2, IDisposable
             return asset.controlSchemes[m_KeyboardAndMouseSchemeIndex];
         }
     }
-    public interface IDefaultActions
+    public interface IRotateCameraActions
     {
         void OnRotateCameraHorizontal(InputAction.CallbackContext context);
         void OnRotateCameraVertical(InputAction.CallbackContext context);
+    }
+    public interface IMoveSelectableActions
+    {
+        void OnHoldSelectable(InputAction.CallbackContext context);
     }
 }

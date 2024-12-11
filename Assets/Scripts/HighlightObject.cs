@@ -38,22 +38,19 @@ public class HighlightObject
 		Highlight(highlightColor);
 	}
 
+	//remove the highlight effect from the current highlighted object
 	public void RemoveHighlights()
     {
-		if (OutlinedObject != null)
-		{
-			Highlight(oldColor);
-			OutlinedObject = null;
-		}
+		Highlight(oldColor);
+		OutlinedObject = null;
 	}
 
 	void Highlight(Color color)
 	{
-		//Renderer[] renderers = OutlinedObject.GetComponentsInChildren<Renderer>();
-
 		Material m = OutlinedObject.material;
 		m.color = color;
 
+		//set the material colors of this mesh renderer and any child renderers to the highlight color
 		MeshRenderer[] renderers = OutlinedObject.GetComponentsInChildren<MeshRenderer>();
 		foreach (MeshRenderer r in renderers)
         {
@@ -62,6 +59,7 @@ public class HighlightObject
         }
 	}
 
+	//Determine if the GameObject passed into this function is different from the object currently being highlighted
 	public bool isDifferentObject(GameObject go)
     {
 		return OutlinedObject == null || go != OutlinedObject.gameObject;

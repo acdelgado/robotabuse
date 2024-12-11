@@ -2,7 +2,7 @@
     "name": "CameraControls",
     "maps": [
         {
-            "name": "Default",
+            "name": "RotateCamera",
             "id": "0f3f71df-3fed-4718-8e28-649bcf8618f3",
             "actions": [
                 {
@@ -90,6 +90,34 @@
                     "action": "RotateCameraVertical",
                     "isComposite": false,
                     "isPartOfComposite": true
+                }
+            ]
+        },
+        {
+            "name": "MoveSelectable",
+            "id": "e88288f8-3dd7-4569-bb53-04f05813f5c7",
+            "actions": [
+                {
+                    "name": "HoldSelectable",
+                    "type": "Button",
+                    "id": "42b47e3f-c25e-46bd-a512-f0404c12ca8a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "57c51370-8a01-448e-bc41-bb65e75138ca",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "HoldSelectable",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }
