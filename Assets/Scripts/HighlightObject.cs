@@ -1,50 +1,48 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HighlightObject : MonoBehaviour
+public class HighlightObject
 {
 	Renderer OutlinedObject;
 	public Color highlightColor;
 	Color oldColor;
 
-	void Update()
-	{
-		var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		bool hitSelectable = Physics.Raycast(ray, out var hit) && hit.transform.CompareTag("Selectable");
-		
-		//if we hit a selectable object that was not hit last update 
-		if(hitSelectable && isDifferentObject(hit.transform.gameObject))
-        {
-			//temp reference to the renderer of the hit object
-			Renderer hitRenderer = hit.transform.GetComponent<Renderer>();
+	public HighlightObject(Color color)
+    {
+		highlightColor = color;
+    }
 
-			//if we aren't highlighting anything, save the color of this renderer's material
-			if (OutlinedObject == null)
-            {
-				oldColor = hitRenderer.material.color;
-            }
+	public void UpdateHighlights(GameObject hitObject)
+    {
+		//temp reference to the renderer of the hit object
+		Renderer hitRenderer = hitObject.GetComponent<Renderer>();
 
-			//otherwise, if this is a different selectable object
-			else
-            {
-				//restore the old color to the current outlined object
-				Highlight(oldColor);
-
-				//update the color we're storing
-				oldColor = hitRenderer.material.color;
-            }
-
-			//keep reference for the object we're highlighting and highlight it
-			OutlinedObject = hitRenderer;
-			Highlight(highlightColor);
-		}
-		
-		else if(!hitSelectable)
+		//if we aren't highlighting anything, save the color of this renderer's material
+		if (OutlinedObject == null)
 		{
-			if(OutlinedObject != null)
-            {
-				Highlight(oldColor);
-            }
+			oldColor = hitRenderer.material.color;
+		}
+
+		//otherwise, if this is a different selectable object
+		else
+		{
+			//restore the old color to the current outlined object
+			Highlight(oldColor);
+
+			//update the color we're storing
+			oldColor = hitRenderer.material.color;
+		}
+
+		//keep reference for the object we're highlighting and highlight it
+		OutlinedObject = hitRenderer;
+		Highlight(highlightColor);
+	}
+
+	public void RemoveHighlights()
+    {
+		if (OutlinedObject != null)
+		{
+			Highlight(oldColor);
 			OutlinedObject = null;
 		}
 	}
@@ -64,7 +62,7 @@ public class HighlightObject : MonoBehaviour
         }
 	}
 
-	bool isDifferentObject(GameObject go)
+	public bool isDifferentObject(GameObject go)
     {
 		return OutlinedObject == null || go != OutlinedObject.gameObject;
     }
