@@ -79,4 +79,6 @@ public class AttachmentPoint : MonoBehaviour
             attachmentPart.transform.position = bond.transform.position;
         }
     }
+
+    public bool HasBond() { return bond != null; }
 }

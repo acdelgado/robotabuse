@@ -1,10 +1,12 @@
-using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     HighlightObject highlightObject;
     [SerializeField] Color highlightColor;
+    [SerializeField] GameObject robotArm;
+    [SerializeField] TextMeshProUGUI statusText;
 
     GameObject currentObject;
     bool isObjectBeingHeld;
@@ -62,6 +64,11 @@ public class GameManager : MonoBehaviour
             highlightObject.RemoveHighlights();
             currentObject = null;
         }
+    }
+
+    private void LateUpdate()
+    {
+        statusText.text = robotArm.transform.parent ? "Attached" : "Detached";
     }
 
     public void SetObjectHeld(bool value) 
