@@ -80,5 +80,12 @@ public class GameManager : MonoBehaviour
         {
             offset = currentObject.transform.position - DragAction.MouseWorldPos(currentObject);
         }
+
+        //otherwise, we are releasing the mouse and might want to check any attachment point changes
+        else
+        {
+            Debug.Log("POOP ASS");
+            currentObject.GetComponentInChildren<AttachmentPoint>()?.SnapPartToPoint();
+        }
     }
 }
