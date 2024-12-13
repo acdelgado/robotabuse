@@ -91,7 +91,6 @@ public class GameManager : MonoBehaviour
         //otherwise, we are releasing the mouse and might want to check any attachment point changes
         else
         {
-            Debug.Log("POOP ASS");
             currentObject.GetComponentInChildren<AttachmentPoint>()?.SnapPartToPoint();
         }
     }

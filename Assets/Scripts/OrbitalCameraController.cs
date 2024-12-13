@@ -40,4 +40,6 @@ public class OrbitalCameraController : MonoBehaviour
     {
         inputVector = new Vector2(inputVector.x, y);
     }
+
+    public Vector2 GetInputVector() { return inputVector; }
 }

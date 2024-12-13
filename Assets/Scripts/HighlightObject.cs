@@ -1,68 +1,102 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class HighlightObject
 {
-	Renderer OutlinedObject;
-	public Color highlightColor;
-	Color oldColor;
+    private Renderer OutlinedObject;
+    public Color highlightColor;
+    private Dictionary<Renderer, Material> originalMaterials = new Dictionary<Renderer, Material>();
 
-	public HighlightObject(Color color)
+    public HighlightObject(Color color)
     {
-		highlightColor = color;
+        highlightColor = color;
     }
 
-	public void UpdateHighlights(GameObject hitObject)
+    public void UpdateHighlights(GameObject hitObject)
     {
-		//temp reference to the renderer of the hit object
-		Renderer hitRenderer = hitObject.GetComponent<Renderer>();
+        // Temp reference to the renderer of the hit object
+        Renderer hitRenderer = hitObject.GetComponent<Renderer>();
+        if (hitRenderer == null) return;
 
-		//if we aren't highlighting anything, save the color of this renderer's material
-		if (OutlinedObject == null)
-		{
-			oldColor = hitRenderer.material.color;
-		}
-
-		//otherwise, if this is a different selectable object
-		else
-		{
-			//restore the old color to the current outlined object
-			Highlight(oldColor);
-
-			//update the color we're storing
-			oldColor = hitRenderer.material.color;
-		}
-
-		//keep reference for the object we're highlighting and highlight it
-		OutlinedObject = hitRenderer;
-		Highlight(highlightColor);
-	}
-
-	//remove the highlight effect from the current highlighted object
-	public void RemoveHighlights()
-    {
-		Highlight(oldColor);
-		OutlinedObject = null;
-	}
-
-	void Highlight(Color color)
-	{
-		Material m = OutlinedObject.material;
-		m.color = color;
-
-		//set the material colors of this mesh renderer and any child renderers to the highlight color
-		MeshRenderer[] renderers = OutlinedObject.GetComponentsInChildren<MeshRenderer>();
-		foreach (MeshRenderer r in renderers)
+        // If we're not highlighting anything, cache the original materials
+        if (OutlinedObject == null)
         {
-			m = r.material;
-			m.color = color;				
+            CacheOriginalMaterials(hitObject);
         }
-	}
+        else if (OutlinedObject != hitRenderer)
+        {
+            // Restore the original materials of the current outlined object
+            RestoreOriginalMaterial();
+            CacheOriginalMaterials(hitObject);
+        }
 
-	//Determine if the GameObject passed into this function is different from the object currently being highlighted
-	public bool isDifferentObject(GameObject go)
-    {
-		return OutlinedObject == null || go != OutlinedObject.gameObject;
+        // Keep reference for the object we're highlighting and highlight it
+        OutlinedObject = hitRenderer;
+        ApplyHighlight();
     }
 
+    public void RemoveHighlights()
+    {
+        RestoreOriginalMaterial();
+        OutlinedObject = null;
+        originalMaterials.Clear();
+    }
+
+    private void ApplyHighlight()
+    {
+        if (OutlinedObject == null)
+            return;
+
+        ////set the material colors of this mesh renderer and any child renderers to the highlight color
+        ApplyHighlightToRenderer(OutlinedObject);
+        foreach (Renderer childRenderer in OutlinedObject.GetComponentsInChildren<Renderer>())
+        {
+            ApplyHighlightToRenderer(childRenderer);
+        }
+    }
+
+    private void ApplyHighlightToRenderer(Renderer renderer)
+    {
+        if (renderer == null) return;
+
+        //clone the material so we don't affect the shared material
+        //This is a safer way of instantiating materials, which I now know!
+        Material highlightMaterial = new Material(renderer.sharedMaterial)
+        {
+            color = highlightColor
+        };
+        renderer.material = highlightMaterial;
+    }
+
+    //A function to cache the original materials in a dictionary.
+    //This lets us use temp clone materials for the mesh renderers we're highlighting.
+    private void CacheOriginalMaterials(GameObject gameObject)
+    {
+        originalMaterials.Clear();
+
+        foreach (Renderer renderer in gameObject.GetComponentsInChildren<Renderer>())
+        {
+            if (renderer != null && !originalMaterials.ContainsKey(renderer))
+            {
+                originalMaterials[renderer] = renderer.sharedMaterial;
+            }
+        }
+    }
+
+    //A function to restore all the materials we cached when we're done highlighting
+    private void RestoreOriginalMaterial()
+    {
+        foreach (KeyValuePair<Renderer, Material> entry in originalMaterials)
+        {
+            if (entry.Key != null)
+            {
+                entry.Key.material = entry.Value;
+            }
+        }
+    }
+
+    public bool isDifferentObject(GameObject go)
+    {
+        return OutlinedObject == null || go != OutlinedObject.gameObject;
+    }
 }
